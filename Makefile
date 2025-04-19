@@ -5,7 +5,12 @@ generate-mocks:
 	@mockgen -destination internal/pkg/auth/mocks/access_mock.go -source internal/pkg/auth/access.go
 
 test: generate-mocks
-	go test -cover  ./...
+	go test ./...
+
+cover-test: generate-mocks
+	go test ./... -cover -coverprofile cover.out
+	go tool cover -html=cover.out
+	rm cover.out
 
 deploy:
 	docker-compose up --build
