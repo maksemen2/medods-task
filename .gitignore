@@ -23,3 +23,8 @@ go.work.sum
 
 # env file
 .env
+
+# Generated files
+*_mock.go
+
+.idea

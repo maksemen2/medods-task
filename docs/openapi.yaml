@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: Authentication Service API
+  description: Part of the authentication service
+  version: 1.0.0
+
+paths:
+  /auth:
+    get:
+      tags:
+        - Authentication
+      summary: Get new tokens pair
+      description: Generates new Access and Refresh tokens for user with specified guid
+      parameters:
+        - in: query
+          name: guid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User's GUID
+      responses:
+        '200':
+          description: Successfully generated tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                access_token: "string"
+                refresh_token: "string"
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error
+
+  /refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh token pair
+      description: Exchange valid refresh token for new access/refresh token pair
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+            example:
+              refresh_token: "string"
+              access_token: "string"
+      responses:
+        '200':
+          description: Successfully refreshed tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid or expired tokens
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT Access Token
+        refresh_token:
+          type: string
+          description: Base64 encoded Refresh Token
+      required:
+        - access_token
+        - refresh_token
+
+    RefreshRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          description: Base64 encoded Refresh Token
+        access_token:
+          type: string
+          description: JWT Access Token
+      required:
+        - refresh_token
+        - access_token
