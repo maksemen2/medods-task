@@ -13,7 +13,7 @@ func HashBytes(plain []byte) (string, error) {
 	return string(hash), nil
 }
 
-// CompareHash сравнивает байты обычной строки с хенированной строки.
+// CompareHashAndBytes сравнивает байты обычной строки с хенированной строки.
 func CompareHashAndBytes(plain []byte, hash string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), plain) == nil
 }
