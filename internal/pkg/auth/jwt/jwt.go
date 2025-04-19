@@ -90,6 +90,10 @@ func (m *JWTTokenManager) Parse(raw string) (auth.Claims, error) {
 		}
 	}
 
+	if !token.Valid {
+		return nil, auth.ErrInvalidToken
+	}
+
 	claims, ok := token.Claims.(*jwtClaims)
 	if !ok {
 		return nil, auth.ErrInvalidToken

@@ -45,19 +45,18 @@ func TestJWTTokenManager_GenerateAndParse(t *testing.T) {
 		assert.Empty(t, claims)
 	})
 
-	t.Run("Invalid Signature", func(t *testing.T) {
+	t.Run("Invalid Token", func(t *testing.T) {
 		manager := jwt.NewManager([]byte("very_secret_key"), 10*time.Minute)
 
 		token, err := manager.Generate(uuid.New(), uuid.New(), "127.0.0.1")
 		assert.NoError(t, err)
 		assert.NotEmpty(t, token)
 
-		token = token[:len(token)-1] + "a"
+		token = token[:len(token)/2] + "A" + token[len(token)/2+1:]
 
 		claims, err := manager.Parse(token)
 		assert.Error(t, err)
-		assert.ErrorIs(t, err, auth.ErrInvalidSignature)
-
+		assert.ErrorIs(t, err, auth.ErrInvalidToken)
 		assert.Empty(t, claims)
 	})
 }
