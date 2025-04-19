@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: Authentication Service API
+  description: API for JWT authentication and token management
+  version: 1.0.0
+
+paths:
+  /auth:
+    get:
+      tags:
+        - Authentication
+      summary: Get new pair of tokens
+      description: Generates new Access and Refresh tokens for specified user
+      parameters:
+        - in: query
+          name: user_guid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User's unique GUID identifier
+      responses:
+        '200':
+          description: Successfully generated tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                access_token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaXAiOiIxMjcuMC4wLjEiLCJqdGkiOiI1N2YwMTg3YS0wYjM4LTQ4YjYtOTQ0Ny05M2E4Zjc2MjVhM2IiLCJleHAiOjE2OTY5NzQ4MDB9.abc123..."
+                refresh_token: "SFMyNTY.g2gDbQAAACQwZjhkYWQwYS1hY2Y3LTQ4NjEtODBiMC1iZjgwNDkyYzVjODbBgAAAAA.MEUCIQCaO7E6F7V7..."
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error
+
+  /refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh token pair
+      description: Exchange valid refresh token for new access/refresh token pair
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+            example:
+              refresh_token: "SFMyNTY.g2gDbQAAACQwZjhkYWQwYS1hY2Y3LTQ4NjEtODBiMC1iZjgwNDkyYzVjODbBgAAAAA.MEUCIQCaO7E6F7V7..."
+              access_token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaXAiOiIxMjcuMC4wLjEiLCJqdGkiOiI1N2YwMTg3YS0wYjM4LTQ4YjYtOTQ0Ny05M2E4Zjc2MjVhM2IiLCJleHAiOjE2OTY5NzQ4MDB9.abc123..."
+      responses:
+        '200':
+          description: Successfully refreshed tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid or expired tokens
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT Access Token
+        refresh_token:
+          type: string
+          description: Base64 encoded Refresh Token
+      required:
+        - access_token
+        - refresh_token
+
+    RefreshRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          description: Base64 encoded Refresh Token
+        access_token:
+          type: string
+          description: JWT Access Token
+      required:
+        - refresh_token
+        - access_token
